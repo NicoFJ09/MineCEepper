@@ -1,11 +1,10 @@
 #lang racket/gui
-;; window.rkt — defines the main window
+; window.rkt — defines the main window
 
-(provide make-main-window)
+(provide make-window)
 
-(define (make-main-window title)
-  ;; Create a new window (frame)
+(define (make-window title)
   (new frame%
        [label title]
-       [width 400]
-       [height 400]))
+       [width 300]
+       [height 300]))
