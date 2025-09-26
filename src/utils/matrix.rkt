@@ -8,10 +8,7 @@
 ;; - Reemplazo de elementos en listas y matrices
 ;; ===============================================================================================
 
-(provide create-list
-         empty-list
-         matrix
-         replace-at-index
+(provide matrix
          replace-in-matrix)
 
 ;; Crea una lista de ceros de longitud num

@@ -16,14 +16,15 @@
          bomb_placement
          count_total_bombs)
 
-(require "../utils/matrix.rkt")
+(require "../utils/matrix.rkt") ; Usado en: bomb_placement, safe_bomb_placement, generate_complete_map, generate_safe_map, place_one_bomb
+(require "../utils/cell.rkt")   ; Usado en: generate_complete_map, generate_safe_map (fill_all_numbers)
 
 ;cantidad de minas por entrada
 (define (cant_minas num)
   (cond
-    ((equal? num 1)0.10)
-    ((equal? num 2)0.15)
-    ((equal? num 3)0.20)
+    ((equal? num 1) 0.10)
+    ((equal? num 2) 0.15)
+    ((equal? num 3) 0.20)
     (else 0.10)))
 
 ;bombas, el floor es redondear hacia abajo y el inexact->exact es para poder pasar de un decimal a un numero exacto
@@ -36,12 +37,10 @@
     (cond
       ((< cols 0) acc)
       (else (row_pos row (- cols 1) (cons (list row cols) acc)))))
-  
   (define (all_rows rows cols acc)
     (cond
       ((< rows 0) acc)
       (else (all_rows (- rows 1) cols (append (row_pos rows (- cols 1) '()) acc)))))
-  
   (all_rows (- rows 1) cols '()))
 
 ;random - versión funcional pura
@@ -51,8 +50,8 @@
       ((null? input) output)
       (else
        ((lambda (rand_index)
-         (shuffle_aux (append (take input rand_index) (drop input (+ rand_index 1)))
-                     (cons (list-ref input rand_index) output)))
+          (shuffle_aux (append (take input rand_index) (drop input (+ rand_index 1)))
+                       (cons (list-ref input rand_index) output)))
         (random (length input))))))
   (shuffle_aux list '()))
 
@@ -69,13 +68,11 @@
        (place_all_bombs 
          (place_one_bomb matrix (caar positions) (cadar positions))
          (cdr positions)))))
-  
   (place_all_bombs matrix 
     (take (shuffle (possible_positions (length matrix) 
                                       (if (null? matrix) 0 (length (car matrix)))))
           (calculate_bombs dificultad (length matrix) 
                           (if (null? matrix) 0 (length (car matrix)))))))
-
 
 ;Función para contar bombas en matriz (útil para lógica y pruebas)
 (define (count_total_bombs matrix)
@@ -90,56 +87,8 @@
       [else (+ (count_bombs_row (car matrix)) (count_all_rows (cdr matrix)))]))
   (count_all_rows matrix))
 
-;=================== FUNCIONES PARA CALCULAR NÚMEROS ADYACENTES ===================
+;=================== GENERACIÓN DE MAPA ===================
 
-;Función para obtener el valor en una posición específica de la matriz
-(define (get_value_at matrix row col)
-  (cond
-    ((or (< row 0) (< col 0)) #f)  
-    ((>= row (length matrix)) #f)   
-    ((>= col (length (car matrix))) #f)   
-    (else (list-ref (list-ref matrix row) col))))
-
-;Función para verificar si hay una mina en una posición
-(define (is_mine? matrix row col)
-  (equal? (get_value_at matrix row col) 'X))
-
-;Función que cuenta las minas adyacentes en las 8 direcciones - funcional pura
-(define (count_adjacent_mines matrix row col)
-  (define (count_mines_aux directions count)
-    (cond
-      ((null? directions) count)
-      (else
-       (count_mines_aux (cdr directions) 
-                       (+ count (if (is_mine? matrix 
-                                             (+ row (caar directions)) 
-                                             (+ col (cadar directions))) 1 0))))))
-  
-  (count_mines_aux '((-1 -1) (-1 0) (-1 1) (0 -1) (0 1) (1 -1) (1 0) (1 1)) 0))
-
-;Función que llena una celda con el número correcto   
-(define (fill_cell_number matrix row col)
-  (cond
-    ((is_mine? matrix row col) matrix)    
-    (else
-     (cond
-       ((equal? (count_adjacent_mines matrix row col) 0) matrix)    
-       (else (replace-in-matrix matrix row col (count_adjacent_mines matrix row col)))))))
-
-;Función que recorre toda la matriz y llena los números   
-(define (fill_all_numbers matrix)
-  (define (fill_row matrix current_row current_col rows cols)
-    (cond
-      ((>= current_row rows) matrix)    
-      ((>= current_col cols) 
-       (fill_row matrix (+ current_row 1) 0 rows cols))   
-      (else
-       (fill_row (fill_cell_number matrix current_row current_col)
-                 current_row (+ current_col 1) rows cols))))
-  
-  (fill_row matrix 0 0 (length matrix) (if (null? matrix) 0 (length (car matrix)))))
-
-;Función principal que genera el mapa completo con minas y números - funcional pura
 (define (generate_complete_map rows cols difficulty)
   (fill_all_numbers (bomb_placement difficulty (matrix rows cols))))
 
@@ -151,19 +100,16 @@
     ;; Evitar la posición clickeada y todas sus adyacentes
     (not (and (>= row (- avoid_row 1)) (<= row (+ avoid_row 1))
               (>= col (- avoid_col 1)) (<= col (+ avoid_col 1)))))
-  
   (define (row_pos row cols acc)
     (cond
       ((< cols 0) acc)
       ((is_safe_position row cols) 
        (row_pos row (- cols 1) (cons (list row cols) acc)))
       (else (row_pos row (- cols 1) acc))))
-  
   (define (all_rows rows cols acc)
     (cond
       ((< rows 0) acc)
       (else (all_rows (- rows 1) cols (append (row_pos rows (- cols 1) '()) acc)))))
-  
   (all_rows (- rows 1) cols '()))
 
 ;Colocación de bombas evitando área segura
@@ -175,13 +121,11 @@
        (place_all_bombs 
          (place_one_bomb matrix (caar positions) (cadar positions))
          (cdr positions)))))
-  
   (define safe_positions_list (safe_positions (length matrix) 
-                                            (if (null? matrix) 0 (length (car matrix)))
-                                            avoid_row avoid_col))
+                                              (if (null? matrix) 0 (length (car matrix)))
+                                              avoid_row avoid_col))
   (define bombs_needed (calculate_bombs dificultad (length matrix) 
-                                      (if (null? matrix) 0 (length (car matrix)))))
-  
+                                        (if (null? matrix) 0 (length (car matrix)))))
   (place_all_bombs matrix (take (shuffle safe_positions_list) bombs_needed)))
 
 ;Función principal para generar mapa seguro (evita mina en primera posición clickeada)
