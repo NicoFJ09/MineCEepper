@@ -13,6 +13,7 @@
 
 (provide cant_minas
          calculate_bombs
+         count_total_bombs
          possible_positions
          shuffle
          place_one_bomb
@@ -108,3 +109,16 @@
   (define bombs_needed (calculate_bombs dificultad (length matrix) 
                                         (if (null? matrix) 0 (length (car matrix)))))
   (place_all_bombs matrix (take (shuffle safe_positions_list) bombs_needed)))
+
+  ;Función para contar bombas en matriz (útil para lógica y pruebas)
+(define (count_total_bombs matrix)
+  (define (count_bombs_row row)
+    (cond
+      [(null? row) 0]
+      [(equal? (car row) 'X) (+ 1 (count_bombs_row (cdr row)))]
+      [else (count_bombs_row (cdr row))]))
+  (define (count_all_rows matrix)
+    (cond
+      [(null? matrix) 0]
+      [else (+ (count_bombs_row (car matrix)) (count_all_rows (cdr matrix)))]))
+  (count_all_rows matrix))

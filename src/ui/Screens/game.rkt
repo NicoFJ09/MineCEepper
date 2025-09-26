@@ -14,6 +14,7 @@
 (provide show-game-screen)
 (require "../../utils/state.rkt"
          "../../utils/game-integration.rkt"
+         "../../utils/bomb.rkt"
          "../../core/map.rkt")  ; Para funciones funcionales puras
 
 ;; Estado de revelación y banderas (temporal - matrices de booleans)

@@ -12,6 +12,7 @@
 
 
 (require "map.rkt")
+(require "../utils/bomb.rkt")
 
 ;; =============================== UTILIDADES DE IMPRESIÓN ===============================
 ;; Imprime una matriz de forma legible en consola
