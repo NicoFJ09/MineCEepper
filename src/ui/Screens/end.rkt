@@ -13,6 +13,7 @@
 (provide show-end-screen)
 (require "../../utils/state.rkt")
 
+;; =============================== UI: PANTALLA DE FIN DE JUEGO ===============================
 (define (show-end-screen mainWindow result)
   (define panel (new vertical-panel% [parent mainWindow]))
   (new message% [parent panel]
@@ -23,18 +24,13 @@
        [parent panel]
        [label "Volver al inicio"]
        [callback (lambda (_btn _evt)
-                   ;; RESETEAR ESTADO COMPLETO antes de ir al inicio
-                   (printf "BUTTON: Volver al inicio presionado~n")
                    (reset-game-state!)
-                   (printf "BUTTON: Cambiando a pantalla start~n")
                    (set-screen 'start))])
-  
-  ;; Botón adicional para jugar de nuevo con la misma configuración
+  ;; =============================== BOTÓN: JUGAR DE NUEVO ===============================
   (new button%
        [parent panel]
        [label "Jugar de nuevo"]
        [callback (lambda (_btn _evt)
-                   ;; RESETEAR ESTADO y ir directo al juego
                    (reset-game-state!)
                    (set-screen 'game))])
   panel)

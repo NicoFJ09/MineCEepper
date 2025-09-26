@@ -12,6 +12,7 @@
 (provide show-start-screen)
 (require "../../utils/state.rkt")
 
+;; =============================== UI: PANTALLA DE INICIO ===============================
 (define (show-start-screen mainWindow)
   (define main-panel (new vertical-panel% [parent mainWindow]))
   
@@ -53,7 +54,7 @@
   
   main-panel)
 
-;; Función para iniciar juego con configuración seleccionada
+;; =============================== LÓGICA: INICIAR NUEVO JUEGO ===============================
 (define (start-new-game size-choice difficulty-choice)
   ;; Obtener tamaño seleccionado
   (define size-index (send size-choice get-selection))

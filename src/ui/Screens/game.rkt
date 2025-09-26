@@ -123,9 +123,10 @@
        ;; Cancelar timer existente y crear uno nuevo
        (cancel-global-timer!)
        (define timer (new timer% 
-                         [notify-callback (lambda () 
-                                           (printf "TIMER: Ejecutando cambio a lose~n")
-                                           (set-screen 'lose))]
+                        [notify-callback (lambda ()
+                                          (printf "TIMER: Ejecutando cambio a lose~n")
+                                          (when (not (eq? (get-screen) 'lose))
+                                            (set-screen 'lose)))]
                          [interval 1000]
                          [just-once? #t]))
        ;; Guardar referencia al timer global
@@ -199,9 +200,10 @@
     ;; Cancelar cualquier timer y ir a pantalla de victoria
     (cancel-global-timer!)
     (define timer (new timer% 
-                      [notify-callback (lambda () 
-                                        (printf "TIMER: Ejecutando cambio a win~n")
-                                        (set-screen 'win))]
+                    [notify-callback (lambda ()
+                                      (printf "TIMER: Ejecutando cambio a win~n")
+                                      (when (not (eq? (get-screen) 'win))
+                                        (set-screen 'win)))]
                       [interval 500]  ; Más rápido que game over
                       [just-once? #t]))
     (set-game-timer! timer)

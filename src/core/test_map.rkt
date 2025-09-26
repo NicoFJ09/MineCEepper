@@ -12,64 +12,38 @@
 
 (require "map.rkt")
 
-;Función para imprimir matriz con formato más limpio
+;; =============================== UTILIDADES DE IMPRESIÓN ===============================
+;; Imprime una matriz de forma legible en consola
 (define (print_matrix_pretty matrix)
   (define (print_row row)
-    (cond
-      ((null? row) (displayln ""))
-      (else
-       (display (if (equal? (car row) 'X) "* " 
-                    (if (equal? (car row) 0) ". " 
-                        (string-append (number->string (car row)) " "))))
-       (print_row (cdr row)))))
-  
-  (define (print_all_rows matrix)
-    (cond
-      ((null? matrix) (void))
-      (else
-       (print_row (car matrix))
-       (print_all_rows (cdr matrix)))))
-  
-  (displayln "========== MAPA GENERADO ==========")
-  (print_all_rows matrix)
-  (displayln "==================================="))
+    (for-each (lambda (cell) (display cell) (display " ")) row)
+    (newline))
+  (for-each print_row matrix))
 
-;Función de prueba simple - funcional pura
+;; =============================== PRUEBAS DE GENERACIÓN DE MAPAS ===============================
+;; Prueba la generación de mapas para diferentes dificultades y tamaños
 (define (test_map_generation)
-  (displayln "Probando generación de mapa 8x10 dificultad fácil (1):")
-  (print_matrix_pretty (generate_complete_map 8 10 1))
-  
-  (displayln "\nProbando generación de mapa 5x5 dificultad difícil (3):")
-  (print_matrix_pretty (generate_complete_map 5 5 3)))
+  (displayln "=== TEST: Generación de mapas ===")
+  (for ([difficulty '(1 2 3)])
+    (for ([size '(4 6 8)])
+      (let ([map (generate_complete_map size size difficulty)])
+        (displayln (format "Mapa ~ax~a dificultad ~a:" size size difficulty))
+        (print_matrix_pretty map)
+        (newline)))))
 
-;Función para contar bombas en matriz (verificación)
-(define (count_total_bombs matrix)
-  (define (count_bombs_row row)
-    (cond
-      ((null? row) 0)
-      ((equal? (car row) 'X) (+ 1 (count_bombs_row (cdr row))))
-      (else (count_bombs_row (cdr row)))))
-  
-  (define (count_all_rows matrix)
-    (cond
-      ((null? matrix) 0)
-      (else (+ (count_bombs_row (car matrix)) (count_all_rows (cdr matrix))))))
-  
-  (count_all_rows matrix))
-
-;Función de verificación completa - funcional pura
+;; =============================== VERIFICACIÓN DE MAPAS ===============================
+;; Verifica que el porcentaje de minas sea correcto y muestra el resultado
 (define (verify_map rows cols difficulty)
-  (displayln (string-append "Mapa " (number->string rows) "x" (number->string cols) 
-                           " - Dificultad: " (number->string difficulty)))
-  (displayln (string-append "Celdas totales: " (number->string (* rows cols))))
-  (displayln (string-append "Bombas esperadas: " (number->string (calculate_bombs difficulty rows cols))))
-  (displayln (string-append "Bombas encontradas: " (number->string 
-                           (count_total_bombs (generate_complete_map rows cols difficulty)))))
-  (displayln (string-append "¿Correcto? " (if (equal? (calculate_bombs difficulty rows cols)
-                                                      (count_total_bombs (generate_complete_map rows cols difficulty))) "SÍ" "NO")))
-  (print_matrix_pretty (generate_complete_map rows cols difficulty)))
+  (let* ([map (generate_complete_map rows cols difficulty)]
+         [bombs (count_total_bombs map)]
+         [expected (calculate_bombs difficulty rows cols)])
+    (displayln (format "Mapa ~ax~a dificultad ~a: Bombas esperadas: ~a, encontradas: ~a"
+                       rows cols difficulty expected bombs))
+    (if (= bombs expected)
+        (displayln "✅ Cantidad de bombas correcta")
+        (displayln "❌ Cantidad de bombas INCORRECTA"))))
 
-; Ejecutar las pruebas
+;; =============================== EJECUCIÓN DE PRUEBAS ===============================
 (test_map_generation)
 
 (displayln "\n=== VERIFICACIONES ADICIONALES ===")
