@@ -15,9 +15,9 @@
 ;; -------------------------------------------------------------------------------
 ;; IMPORTS
 ;; -------------------------------------------------------------------------------
-(require "../utils/game/matrix.rkt") ; Usado en: generate_map (para crear el tablero base)
-(require "../utils/game/cell.rkt")   ; Usado en: generate_map (fill_all_numbers)
-(require "../utils/game/bomb.rkt")   ; Usado en: generate_map (safe_bomb_placement)
+(require "../utils/map/matrix.rkt") ; Usado en: generate_map (para crear el tablero base)
+(require "../utils/map/cell.rkt")   ; Usado en: generate_map (fill_all_numbers)
+(require "../utils/map/bomb.rkt")   ; Usado en: generate_map (safe_bomb_placement)
 
 ;; -------------------------------------------------------------------------------
 ;; GENERACIÓN DE MAPA SEGURO (EVITANDO POSICIÓN SELECCIONADA)

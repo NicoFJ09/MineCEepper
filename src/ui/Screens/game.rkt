@@ -14,7 +14,7 @@
 (provide show-game-screen)
 (require "../../utils/state.rkt"
          "../../utils/game/game-integration.rkt"
-         "../../utils/game/bomb.rkt"
+         "../../utils/map/bomb.rkt"
          "../../core/map.rkt")
 
 ;; Estado de revelación y banderas (temporal - matrices de booleans)
