@@ -12,67 +12,18 @@
 ; Exportar funciones principales
 (provide generate_complete_map
          generate_safe_map
-         calculate_bombs
-         bomb_placement
          count_total_bombs)
 
-(require "../utils/matrix.rkt") ; Usado en: bomb_placement, safe_bomb_placement, generate_complete_map, generate_safe_map, place_one_bomb
+;; -------------------------------------------------------------------------------
+;; IMPORTS
+;; -------------------------------------------------------------------------------
+(require "../utils/matrix.rkt") ; Usado en: generate_complete_map, generate_safe_map (para crear el tablero base)
 (require "../utils/cell.rkt")   ; Usado en: generate_complete_map, generate_safe_map (fill_all_numbers)
+(require "../utils/bomb.rkt")   ; Usado en: generate_complete_map (bomb_placement), generate_safe_map (safe_bomb_placement)
 
-;cantidad de minas por entrada
-(define (cant_minas num)
-  (cond
-    ((equal? num 1) 0.10)
-    ((equal? num 2) 0.15)
-    ((equal? num 3) 0.20)
-    (else 0.10)))
-
-;bombas, el floor es redondear hacia abajo y el inexact->exact es para poder pasar de un decimal a un numero exacto
-(define (calculate_bombs dificultad rows cols)
-  (inexact->exact (floor (* (* rows cols) (cant_minas dificultad)))))
-
-;posiciones posibles 
-(define (possible_positions rows cols)
-  (define (row_pos row cols acc)
-    (cond
-      ((< cols 0) acc)
-      (else (row_pos row (- cols 1) (cons (list row cols) acc)))))
-  (define (all_rows rows cols acc)
-    (cond
-      ((< rows 0) acc)
-      (else (all_rows (- rows 1) cols (append (row_pos rows (- cols 1) '()) acc)))))
-  (all_rows (- rows 1) cols '()))
-
-;random - versión funcional pura
-(define (shuffle list)
-  (define (shuffle_aux input output)
-    (cond
-      ((null? input) output)
-      (else
-       ((lambda (rand_index)
-          (shuffle_aux (append (take input rand_index) (drop input (+ rand_index 1)))
-                       (cons (list-ref input rand_index) output)))
-        (random (length input))))))
-  (shuffle_aux list '()))
-
-;remplazo por una bomba - la bomba es representada por una X 
-(define (place_one_bomb matrix row col)
-  (replace-in-matrix matrix row col 'X))
-
-;se ponen las bombas en la matriz - versión funcional pura
-(define (bomb_placement dificultad matrix)
-  (define (place_all_bombs matrix positions)
-    (cond
-      ((null? positions) matrix)
-      (else
-       (place_all_bombs 
-         (place_one_bomb matrix (caar positions) (cadar positions))
-         (cdr positions)))))
-  (place_all_bombs matrix 
-    (take (shuffle (possible_positions (length matrix) 
-                                      (if (null? matrix) 0 (length (car matrix)))))
-          (calculate_bombs dificultad (length matrix) 
-                          (if (null? matrix) 0 (length (car matrix)))))))
+;; -------------------------------------------------------------------------------
+;; FUNCIONES DE UTILIDAD Y GENERACIÓN DE MAPA
+;; -------------------------------------------------------------------------------
 
 ;Función para contar bombas en matriz (útil para lógica y pruebas)
 (define (count_total_bombs matrix)
@@ -87,47 +38,16 @@
       [else (+ (count_bombs_row (car matrix)) (count_all_rows (cdr matrix)))]))
   (count_all_rows matrix))
 
-;=================== GENERACIÓN DE MAPA ===================
+;; -------------------------------------------------------------------------------
+;; GENERACIÓN DE MAPA
+;; -------------------------------------------------------------------------------
 
 (define (generate_complete_map rows cols difficulty)
   (fill_all_numbers (bomb_placement difficulty (matrix rows cols))))
 
-;=================== GENERACIÓN DE MAPA SEGURO (EVITANDO POSICIÓN) ===================
+;; -------------------------------------------------------------------------------
+;; GENERACIÓN DE MAPA SEGURO (EVITANDO POSICIÓN)
+;; -------------------------------------------------------------------------------
 
-;Posiciones posibles excluyendo una posición específica y sus adyacentes
-(define (safe_positions rows cols avoid_row avoid_col)
-  (define (is_safe_position row col)
-    ;; Evitar la posición clickeada y todas sus adyacentes
-    (not (and (>= row (- avoid_row 1)) (<= row (+ avoid_row 1))
-              (>= col (- avoid_col 1)) (<= col (+ avoid_col 1)))))
-  (define (row_pos row cols acc)
-    (cond
-      ((< cols 0) acc)
-      ((is_safe_position row cols) 
-       (row_pos row (- cols 1) (cons (list row cols) acc)))
-      (else (row_pos row (- cols 1) acc))))
-  (define (all_rows rows cols acc)
-    (cond
-      ((< rows 0) acc)
-      (else (all_rows (- rows 1) cols (append (row_pos rows (- cols 1) '()) acc)))))
-  (all_rows (- rows 1) cols '()))
-
-;Colocación de bombas evitando área segura
-(define (safe_bomb_placement dificultad matrix avoid_row avoid_col)
-  (define (place_all_bombs matrix positions)
-    (cond
-      ((null? positions) matrix)
-      (else
-       (place_all_bombs 
-         (place_one_bomb matrix (caar positions) (cadar positions))
-         (cdr positions)))))
-  (define safe_positions_list (safe_positions (length matrix) 
-                                              (if (null? matrix) 0 (length (car matrix)))
-                                              avoid_row avoid_col))
-  (define bombs_needed (calculate_bombs dificultad (length matrix) 
-                                        (if (null? matrix) 0 (length (car matrix)))))
-  (place_all_bombs matrix (take (shuffle safe_positions_list) bombs_needed)))
-
-;Función principal para generar mapa seguro (evita mina en primera posición clickeada)
 (define (generate_safe_map rows cols difficulty first_click_row first_click_col)
   (fill_all_numbers (safe_bomb_placement difficulty (matrix rows cols) first_click_row first_click_col)))
