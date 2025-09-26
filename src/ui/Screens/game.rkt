@@ -13,9 +13,9 @@
 
 (provide show-game-screen)
 (require "../../utils/state.rkt"
-         "../../utils/game-integration.rkt"
-         "../../utils/bomb.rkt"
-         "../../core/map.rkt")  ; Para funciones funcionales puras
+         "../../utils/game/game-integration.rkt"
+         "../../utils/game/bomb.rkt"
+         "../../core/map.rkt")
 
 ;; Estado de revelación y banderas (temporal - matrices de booleans)
 (define revealed-cells (box '()))
@@ -39,18 +39,16 @@
     (new button%
          [parent parent]
          [label (load-image asset-path)]
-         [min-width 25]    ; Más pequeño
+         [min-width 25]
          [min-height 25]
-         [horiz-margin 0]  ; Sin margen
+         [horiz-margin 0]
          [vert-margin 0]
-         [stretchable-width #f]  ; No estirable
+         [stretchable-width #f]
          [stretchable-height #f]
          [callback (lambda (button event)
                      (cond
-                       [(eq? (send event get-event-type) 'right-down)
-                        (handle-right-click row col button)] ; Click derecho para bandera
                        [(unbox flag-mode)
-                        (handle-right-click row col button)] ; Modo bandera activo
+                        (handle-flag-click row col button)]
                        [else 
                         (handle-cell-click row col button)]))]))
   
@@ -146,8 +144,8 @@
        ;; Verificar victoria después de revelar celda individual
        (check-victory!)])))
 
-;; Manejar click derecho (bandera) - ¡FUNCIONALIDAD COMPLETA!
-(define (handle-right-click row col button)
+;; Manejar click bandera
+(define (handle-flag-click row col button)
   (define is-flagged (get-cell-flagged row col))
   (define is-revealed (get-cell-revealed row col))
   
@@ -165,7 +163,7 @@
        (printf "Poniendo bandera en [~a,~a]~n" row col)  
        (set-cell-flagged row col #t)
        ;; Mostrar bandera
-       (update-button-image row col "./assets/buttons/flag.png")])))
+       (update-button-image row col "./assets/tiles/flag.png")])))
 
 ;; Revelar una celda específica  
 (define (reveal-cell row col cell-value)
