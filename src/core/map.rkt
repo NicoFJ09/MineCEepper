@@ -10,16 +10,15 @@
 ;; ===============================================================================================
 
 ; Exportar funciones principales
-(provide generate_complete_map
-         generate_safe_map
+(provide generate_map
          count_total_bombs)
 
 ;; -------------------------------------------------------------------------------
 ;; IMPORTS
 ;; -------------------------------------------------------------------------------
-(require "../utils/matrix.rkt") ; Usado en: generate_complete_map, generate_safe_map (para crear el tablero base)
-(require "../utils/cell.rkt")   ; Usado en: generate_complete_map, generate_safe_map (fill_all_numbers)
-(require "../utils/bomb.rkt")   ; Usado en: generate_complete_map (bomb_placement), generate_safe_map (safe_bomb_placement)
+(require "../utils/matrix.rkt") ; Usado en: generate_map (para crear el tablero base)
+(require "../utils/cell.rkt")   ; Usado en: generate_map (fill_all_numbers)
+(require "../utils/bomb.rkt")   ; Usado en: generate_map (safe_bomb_placement)
 
 ;; -------------------------------------------------------------------------------
 ;; FUNCIONES DE UTILIDAD Y GENERACIÓN DE MAPA
@@ -39,15 +38,8 @@
   (count_all_rows matrix))
 
 ;; -------------------------------------------------------------------------------
-;; GENERACIÓN DE MAPA
-;; -------------------------------------------------------------------------------
-
-(define (generate_complete_map rows cols difficulty)
-  (fill_all_numbers (bomb_placement difficulty (matrix rows cols))))
-
-;; -------------------------------------------------------------------------------
 ;; GENERACIÓN DE MAPA SEGURO (EVITANDO POSICIÓN)
 ;; -------------------------------------------------------------------------------
 
-(define (generate_safe_map rows cols difficulty first_click_row first_click_col)
+(define (generate_map rows cols difficulty first_click_row first_click_col)
   (fill_all_numbers (safe_bomb_placement difficulty (matrix rows cols) first_click_row first_click_col)))

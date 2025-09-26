@@ -10,6 +10,7 @@
 ;; - Pruebas de mapas seguros (evitando posiciones)
 ;; ===============================================================================================
 
+
 (require "map.rkt")
 
 ;; =============================== UTILIDADES DE IMPRESIÓN ===============================
@@ -26,18 +27,18 @@
   (displayln "=== TEST: Generación de mapas ===")
   (for ([difficulty '(1 2 3)])
     (for ([size '(4 6 8)])
-      (let ([map (generate_complete_map size size difficulty)])
-        (displayln (format "Mapa ~ax~a dificultad ~a:" size size difficulty))
+      (let ([map (generate_map size size difficulty 0 0)])
+        (displayln (format "Mapa ~ax~a dificultad ~a (seguro en 0,0):" size size difficulty))
         (print_matrix_pretty map)
         (newline)))))
 
 ;; =============================== VERIFICACIÓN DE MAPAS ===============================
 ;; Verifica que el porcentaje de minas sea correcto y muestra el resultado
 (define (verify_map rows cols difficulty)
-  (let* ([map (generate_complete_map rows cols difficulty)]
+  (let* ([map (generate_map rows cols difficulty 0 0)]
          [bombs (count_total_bombs map)]
          [expected (calculate_bombs difficulty rows cols)])
-    (displayln (format "Mapa ~ax~a dificultad ~a: Bombas esperadas: ~a, encontradas: ~a"
+    (displayln (format "Mapa ~ax~a dificultad ~a (seguro en 0,0): Bombas esperadas: ~a, encontradas: ~a"
                        rows cols difficulty expected bombs))
     (if (= bombs expected)
         (displayln "✅ Cantidad de bombas correcta")
