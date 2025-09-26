@@ -14,7 +14,8 @@
          generate_safe_map
          matrix
          bomb_placement
-         calculate_bombs)
+         calculate_bombs
+         count_total_bombs)
 
 ;cantidad de minas por entrada
 (define (cant_minas num)
@@ -106,14 +107,19 @@
           (calculate_bombs dificultad (length matrix) 
                           (if (null? matrix) 0 (length (car matrix)))))))
 
-;Para las pruebas se puede usar:
 
-(define (print_ matrix)
-  (cond
-    ((null? matrix) (void))
-    (else
-     (displayln (car matrix))
-     (print_ (cdr matrix)))))
+;Función para contar bombas en matriz (útil para lógica y pruebas)
+(define (count_total_bombs matrix)
+  (define (count_bombs_row row)
+    (cond
+      [(null? row) 0]
+      [(equal? (car row) 'X) (+ 1 (count_bombs_row (cdr row)))]
+      [else (count_bombs_row (cdr row))]))
+  (define (count_all_rows matrix)
+    (cond
+      [(null? matrix) 0]
+      [else (+ (count_bombs_row (car matrix)) (count_all_rows (cdr matrix)))]))
+  (count_all_rows matrix))
 
 ;=================== FUNCIONES PARA CALCULAR NÚMEROS ADYACENTES ===================
 
