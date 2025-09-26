@@ -13,8 +13,7 @@
 (provide generate-game-map
          create-game-map
          get-cell-asset-path
-         difficulty-to-number
-         number-to-difficulty)
+         difficulty-to-number)
 
 (require "../state.rkt"
          "../../core/map.rkt")
@@ -26,14 +25,6 @@
     [(equal? difficulty 'medium) 2]  ; 15% minas  
     [(equal? difficulty 'hard) 3]    ; 20% minas
     [else 1]))
-
-;; Convierte números a nombres de dificultad  
-(define (number-to-difficulty num)
-  (cond
-    [(equal? num 1) 'easy]
-    [(equal? num 2) 'medium]
-    [(equal? num 3) 'hard]
-    [else 'easy]))
 
 ;; ================= FUNCIONES DE CREACIÓN =================
 
