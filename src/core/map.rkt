@@ -25,7 +25,6 @@
     ((equal? num 3)0.20)
     (else 0.10)))
 
-
 (define (create_list num)
   (cond
     ((equal? num 0) '())
