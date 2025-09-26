@@ -12,10 +12,11 @@
 ; Exportar funciones principales
 (provide generate_complete_map
          generate_safe_map
-         matrix
-         bomb_placement
          calculate_bombs
+         bomb_placement
          count_total_bombs)
+
+(require "../utils/matrix.rkt")
 
 ;cantidad de minas por entrada
 (define (cant_minas num)
@@ -24,37 +25,6 @@
     ((equal? num 2)0.15)
     ((equal? num 3)0.20)
     (else 0.10)))
-
-(define (create_list num)
-  (cond
-    ((equal? num 0) '())
-    (else (cons 0 (create_list (- num 1))))))
-
-(define (empty_list num)
-  (cond
-    ((equal? num 0) '())
-    (else (cons '() (create_list (- num 1))))))
-
-(define (matrix rows columns)
-  (cond
-    ((equal? rows 0) '())
-    (else (cons(create_list columns)(matrix (- rows 1)columns)))))
-
-
-;remplaza por lista
-(define (replace_at_index list i value)
-  (cond
-    ((null? list) '())
-    ((equal? i 0) (cons value (cdr list)))
-    (else (cons (car list) (replace_at_index (cdr list) (- i 1) value)))))
-
-;remplazo en matrix
-(define (replace_in_matrix matrix row col value)
-  (cond
-    ((null? matrix) '())
-    ((equal? row 0)(cons (replace_at_index (car matrix) col value) (cdr matrix)))
-    (else 
-     (cons (car matrix) (replace_in_matrix (cdr matrix) (- row 1) col value)))))
 
 ;bombas, el floor es redondear hacia abajo y el inexact->exact es para poder pasar de un decimal a un numero exacto
 (define (calculate_bombs dificultad rows cols)
@@ -88,7 +58,7 @@
 
 ;remplazo por una bomba - la bomba es representada por una X 
 (define (place_one_bomb matrix row col)
-  (replace_in_matrix matrix row col 'X))
+  (replace-in-matrix matrix row col 'X))
 
 ;se ponen las bombas en la matriz - versión funcional pura
 (define (bomb_placement dificultad matrix)
@@ -154,7 +124,7 @@
     (else
      (cond
        ((equal? (count_adjacent_mines matrix row col) 0) matrix)    
-       (else (replace_in_matrix matrix row col (count_adjacent_mines matrix row col)))))))
+       (else (replace-in-matrix matrix row col (count_adjacent_mines matrix row col)))))))
 
 ;Función que recorre toda la matriz y llena los números   
 (define (fill_all_numbers matrix)

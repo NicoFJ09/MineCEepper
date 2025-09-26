@@ -21,9 +21,6 @@
 (require "state.rkt"
          "../core/map.rkt")
 
-;; Importar nueva función segura
-(require "../core/map.rkt")
-
 ;; Convierte nombres de dificultad a números
 (define (difficulty-to-number difficulty)
   (cond
@@ -40,8 +37,7 @@
     [(equal? num 3) 'hard]
     [else 'easy]))
 
-;; ================= FUNCIONES =================
-
+;; ================= FUNCIONES DE CREACIÓN =================
 
 ;; Generar mapa basado en configuración 
 (define (create-game-map config)
