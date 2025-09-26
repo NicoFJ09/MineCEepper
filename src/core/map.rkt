@@ -1,7 +1,17 @@
 #lang racket
 
+;; ===============================================================================================
+;; MAP.RKT - Motor de generación de mapas de buscaminas
+;; ===============================================================================================
+;; Funcionalidad: Genera matrices de juego con minas y números usando algoritmos funcionales puros
+;; - Crea mapas aleatorios con porcentajes de minas según dificultad
+;; - Genera mapas seguros evitando posiciones específicas (primer click)
+;; - Calcula números adyacentes para cada celda
+;; ===============================================================================================
+
 ; Exportar funciones principales
 (provide generate_complete_map
+         generate_safe_map
          test_map_generation
          verify_map
          print_matrix_pretty
@@ -228,3 +238,48 @@
   (displayln (string-append "¿Correcto? " (if (equal? (calculate_bombs difficulty rows cols)
                                                       (count_total_bombs (generate_complete_map rows cols difficulty))) "SÍ" "NO")))
   (print_matrix_pretty (generate_complete_map rows cols difficulty)))
+
+;=================== GENERACIÓN DE MAPA SEGURO (EVITANDO POSICIÓN) ===================
+
+;Posiciones posibles excluyendo una posición específica y sus adyacentes
+(define (safe_positions rows cols avoid_row avoid_col)
+  (define (is_safe_position row col)
+    ;; Evitar la posición clickeada y todas sus adyacentes
+    (not (and (>= row (- avoid_row 1)) (<= row (+ avoid_row 1))
+              (>= col (- avoid_col 1)) (<= col (+ avoid_col 1)))))
+  
+  (define (row_pos row cols acc)
+    (cond
+      ((< cols 0) acc)
+      ((is_safe_position row cols) 
+       (row_pos row (- cols 1) (cons (list row cols) acc)))
+      (else (row_pos row (- cols 1) acc))))
+  
+  (define (all_rows rows cols acc)
+    (cond
+      ((< rows 0) acc)
+      (else (all_rows (- rows 1) cols (append (row_pos rows (- cols 1) '()) acc)))))
+  
+  (all_rows (- rows 1) cols '()))
+
+;Colocación de bombas evitando área segura
+(define (safe_bomb_placement dificultad matrix avoid_row avoid_col)
+  (define (place_all_bombs matrix positions)
+    (cond
+      ((null? positions) matrix)
+      (else
+       (place_all_bombs 
+         (place_one_bomb matrix (caar positions) (cadar positions))
+         (cdr positions)))))
+  
+  (define safe_positions_list (safe_positions (length matrix) 
+                                            (if (null? matrix) 0 (length (car matrix)))
+                                            avoid_row avoid_col))
+  (define bombs_needed (calculate_bombs dificultad (length matrix) 
+                                      (if (null? matrix) 0 (length (car matrix)))))
+  
+  (place_all_bombs matrix (take (shuffle safe_positions_list) bombs_needed)))
+
+;Función principal para generar mapa seguro (evita mina en primera posición clickeada)
+(define (generate_safe_map rows cols difficulty first_click_row first_click_col)
+  (fill_all_numbers (safe_bomb_placement difficulty (matrix rows cols) first_click_row first_click_col)))

@@ -1,5 +1,15 @@
 #lang racket
 
+;; ===============================================================================================
+;; TEST_MAP.RKT - Pruebas unitarias del generador de mapas
+;; ===============================================================================================
+;; Funcionalidad: Verificación de algoritmos de generación de mapas
+;; - Tests de generación de mapas con diferentes dificultades
+;; - Validación de porcentajes de minas  
+;; - Verificación de números adyacentes calculados
+;; - Pruebas de mapas seguros (evitando posiciones)
+;; ===============================================================================================
+
 (require "map.rkt")
 
 ; Ejecutar las pruebas

@@ -1,4 +1,14 @@
 #lang racket
+
+;; ===============================================================================================
+;; APP.RKT - Controlador principal de la aplicación UI
+;; ===============================================================================================
+;; Funcionalidad: Inicializa y coordina la interfaz gráfica del juego
+;; - Crea la ventana principal del juego
+;; - Registra callbacks para cambios de pantalla
+;; - Coordina la visualización y navegación
+;; ===============================================================================================
+
 (provide start-ui)
 (require "window.rkt" "display.rkt" "../utils/state.rkt" racket/gui)
 
