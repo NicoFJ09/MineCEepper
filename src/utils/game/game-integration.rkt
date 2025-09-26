@@ -17,8 +17,8 @@
          difficulty-to-number
          number-to-difficulty)
 
-(require "state.rkt"
-         "../core/map.rkt")
+(require "../state.rkt"
+         "../../core/map.rkt")
 
 ;; Convierte nombres de dificultad a números
 (define (difficulty-to-number difficulty)
@@ -74,10 +74,10 @@
 ;; Mapea el contenido de una celda al asset correspondiente
 (define (get-cell-asset-path cell-value is-revealed? is-flagged?)
   (cond
-    [is-flagged? "./assets/buttons/flag.png"]           ; Bandera
+    [is-flagged? "./assets/tiles/flag.png"]           ; Bandera
     [(not is-revealed?) "./assets/tiles/tile.png"]      ; Celda oculta
-    [(equal? cell-value 'X) "./assets/buttons/mine.png"] ; Mina revelada
-    [(equal? cell-value 0) "./assets/buttons/zeros.png"] ; Celda vacía 
+    [(equal? cell-value 'X) "./assets/tiles/mine.png"] ; Mina revelada
+    [(equal? cell-value 0) "./assets/tiles/zeros.png"] ; Celda vacía 
     [(and (number? cell-value) (> cell-value 0))       ; Números 1-8
-     (string-append "./assets/buttons/number" (number->string cell-value) ".png")]
+     (string-append "./assets/tiles/number" (number->string cell-value) ".png")]
     [else "./assets/tiles/tile.png"]))                  ; Fallback
