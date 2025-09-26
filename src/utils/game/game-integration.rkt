@@ -10,9 +10,8 @@
 ;; - Conversión entre formatos de dificultad
 ;; ===============================================================================================
 
-(provide generate-safe-game-map!
+(provide generate-game-map
          create-game-map
-         create-safe-game-map
          get-cell-asset-path
          difficulty-to-number
          number-to-difficulty)
@@ -38,20 +37,8 @@
 
 ;; ================= FUNCIONES DE CREACIÓN =================
 
-;; Generar mapa seguro basado en configuración (siempre)
-(define (create-game-map config first-row first-col)
-  (define rows (game-vars-rows config))
-  (define cols (game-vars-cols config))
-  (define raw-difficulty (game-vars-difficulty config))
-  (printf "DEBUG: raw-difficulty = ~a (es número? ~a)~n" raw-difficulty (number? raw-difficulty))
-  (define difficulty (if (number? raw-difficulty)
-                        raw-difficulty  ; Ya es número, usarlo directamente
-                        (difficulty-to-number raw-difficulty)))  ; Es símbolo, convertir
-  (printf "DEBUG: difficulty final = ~a~n" difficulty)
-  (generate_map rows cols difficulty first-row first-col))
-
 ;; Generar mapa seguro basado en configuración
-(define (create-safe-game-map config first-row first-col)
+(define (create-game-map config first-row first-col)
   (define rows (game-vars-rows config))
   (define cols (game-vars-cols config))
   (define raw-difficulty (game-vars-difficulty config))
@@ -65,9 +52,9 @@
 ;; ================= FUNCIONES DE INTERFAZ =================
 
 ;; Genera un mapa seguro evitando una posición específica (primer click)
-(define (generate-safe-game-map! first-row first-col)
+(define (generate-game-map first-row first-col)
   (define config (get-game-config))
-  (define new-map (create-safe-game-map config first-row first-col))
+  (define new-map (create-game-map config first-row first-col))
   (set-game-map! new-map)
   new-map)
 

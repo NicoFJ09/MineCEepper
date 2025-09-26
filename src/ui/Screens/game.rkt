@@ -104,7 +104,7 @@
     ;; PRIMER CLICK: Generar mapa evitando esta posición
     (when (is-first-click?)
       (printf "PRIMER CLICK en [~a,~a] - Generando mapa seguro...~n" row col)
-      (generate-safe-game-map! row col)
+      (generate-game-map row col)
       (set-first-click! #f))
     
     ;; Obtener el mapa ya generado
