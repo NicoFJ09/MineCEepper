@@ -1,7 +1,26 @@
 #lang racket/gui
+(provide display-screen)
+(require "../utils/state.rkt"
+         "Screens/start.rkt"
+         "Screens/game.rkt"
+         "Screens/end.rkt")
 
-(provide draw-matrix)
+(define (remove-all-children parent)
+  (for ([child (send parent get-children)])
+    (send parent delete-child child)))
 
+(define (display-screen mainWindow)
+  (remove-all-children mainWindow)
+  (cond
+    [(eq? (get-screen) 'start) (show-start-screen mainWindow)]
+    [(eq? (get-screen) 'game)  (show-game-screen mainWindow)]
+    [(eq? (get-screen) 'win)   (show-end-screen mainWindow 'win)]
+    [(eq? (get-screen) 'lose)  (show-end-screen mainWindow 'lose)]
+    [else                      (show-start-screen mainWindow)]))
+
+
+; =============================== HARDCODED FOR NOW, TO BE MOVED LATER ===============================
+; --- draw-matrix ---
 (define (draw-matrix mainWindow)
   
 ; Pasar luego n filas y m filas pasadas del input del menu

@@ -6,5 +6,5 @@
 (define (make-window title)
   (new frame%
        [label title]
-       [width 300]
-       [height 300]))
+       [width 1280]
+       [height 720]))
