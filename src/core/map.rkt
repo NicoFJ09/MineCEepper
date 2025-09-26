@@ -12,12 +12,9 @@
 ; Exportar funciones principales
 (provide generate_complete_map
          generate_safe_map
-         test_map_generation
-         verify_map
-         print_matrix_pretty
-         count_total_bombs
          matrix
-         bomb_placement)
+         bomb_placement
+         calculate_bombs)
 
 ;cantidad de minas por entrada
 (define (cant_minas num)
@@ -44,12 +41,6 @@
     (else (cons(create_list columns)(matrix (- rows 1)columns)))))
 
 
-;se me pasa una matriz, si la dificultad es de 1 entonces tengo que usar un 10%,2 un 15 y 3 un 20
-;ocupo una funcion que remplace cosas
-;ocupo una funcion que ponga aleatoriamente esas bombas
-;y una funcion que las ponga como tal
-
-
 ;remplaza por lista
 (define (replace_at_index list i value)
   (cond
@@ -68,9 +59,6 @@
 ;bombas, el floor es redondear hacia abajo y el inexact->exact es para poder pasar de un decimal a un numero exacto
 (define (calculate_bombs dificultad rows cols)
   (inexact->exact (floor (* (* rows cols) (cant_minas dificultad)))))
-
-;esta parte está dividida solo para referencia de hasta donde terminé de trabajar el lunes
-
 
 ;posiciones posibles 
 (define (possible_positions rows cols)
@@ -179,65 +167,6 @@
 ;Función principal que genera el mapa completo con minas y números - funcional pura
 (define (generate_complete_map rows cols difficulty)
   (fill_all_numbers (bomb_placement difficulty (matrix rows cols))))
-
-;=================== FUNCIONES DE TESTING ===================
-
-;Función para imprimir matriz con formato más limpio
-(define (print_matrix_pretty matrix)
-  (define (print_row row)
-    (cond
-      ((null? row) (displayln ""))
-      (else
-       (display (if (equal? (car row) 'X) "* " 
-                    (if (equal? (car row) 0) ". " 
-                        (string-append (number->string (car row)) " "))))
-       (print_row (cdr row)))))
-  
-  (define (print_all_rows matrix)
-    (cond
-      ((null? matrix) (void))
-      (else
-       (print_row (car matrix))
-       (print_all_rows (cdr matrix)))))
-  
-  (displayln "========== MAPA GENERADO ==========")
-  (print_all_rows matrix)
-  (displayln "==================================="))
-
-;Función de prueba simple - funcional pura
-(define (test_map_generation)
-  (displayln "Probando generación de mapa 8x10 dificultad fácil (1):")
-  (print_matrix_pretty (generate_complete_map 8 10 1))
-  
-  (displayln "\nProbando generación de mapa 5x5 dificultad difícil (3):")
-  (print_matrix_pretty (generate_complete_map 5 5 3)))
-
-;Función para contar bombas en matriz (verificación)
-(define (count_total_bombs matrix)
-  (define (count_bombs_row row)
-    (cond
-      ((null? row) 0)
-      ((equal? (car row) 'X) (+ 1 (count_bombs_row (cdr row))))
-      (else (count_bombs_row (cdr row)))))
-  
-  (define (count_all_rows matrix)
-    (cond
-      ((null? matrix) 0)
-      (else (+ (count_bombs_row (car matrix)) (count_all_rows (cdr matrix))))))
-  
-  (count_all_rows matrix))
-
-;Función de verificación completa - funcional pura
-(define (verify_map rows cols difficulty)
-  (displayln (string-append "Mapa " (number->string rows) "x" (number->string cols) 
-                           " - Dificultad: " (number->string difficulty)))
-  (displayln (string-append "Celdas totales: " (number->string (* rows cols))))
-  (displayln (string-append "Bombas esperadas: " (number->string (calculate_bombs difficulty rows cols))))
-  (displayln (string-append "Bombas encontradas: " (number->string 
-                           (count_total_bombs (generate_complete_map rows cols difficulty)))))
-  (displayln (string-append "¿Correcto? " (if (equal? (calculate_bombs difficulty rows cols)
-                                                      (count_total_bombs (generate_complete_map rows cols difficulty))) "SÍ" "NO")))
-  (print_matrix_pretty (generate_complete_map rows cols difficulty)))
 
 ;=================== GENERACIÓN DE MAPA SEGURO (EVITANDO POSICIÓN) ===================
 
