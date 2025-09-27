@@ -137,8 +137,16 @@
   (define rows (game-vars-rows config))
   (define cols (game-vars-cols config))
   (init-game-state rows cols)
-  (define main-panel (new vertical-panel% [parent mainWindow]))
-  (define info-panel (new horizontal-panel% [parent main-panel] [min-height 50]))
+  (define main-panel (new vertical-panel% [parent mainWindow]
+                          [horiz-margin 2]
+                          [vert-margin 2]
+                          [spacing 0]
+                          [alignment '(center center)]
+                          [stretchable-height #t]))
+  ;; Panel superior: tamaño y dificultad
+  (define info-panel (new vertical-panel% [parent main-panel]
+                         [alignment '(center center)]
+                         [spacing 0]))
   (define difficulty-name 
     (cond
       [(equal? (game-vars-difficulty config) 1) "Fácil"]
@@ -146,31 +154,45 @@
       [(equal? (game-vars-difficulty config) 3) "Difícil"]
       [else "Desconocido"]))
   (new message% [parent info-panel] 
-       [label (string-append "MineCEepper - " 
-                            (number->string rows) "x" (number->string cols)
-                            " - " difficulty-name)])
-  (new button% [parent info-panel] [label "Nuevo Juego"] 
+    [label (string-append "Tamaño: " (number->string rows) "x" (number->string cols))]
+    [font (make-object font% 16 'default 'normal 'bold)])
+  (new message% [parent info-panel] 
+    [label (string-append "Dificultad: " difficulty-name)]
+    [font (make-object font% 16 'default 'normal 'bold)])
+  ;; Panel de botones y modo bandera juntos
+  (define controls-panel (new horizontal-panel% [parent main-panel]
+                             [alignment '(center center)]
+                             [spacing 0]))
+  (new button% [parent controls-panel] [label "⟳ Nuevo Juego"] 
+       [min-width 100]
        [callback (lambda (btn evt) (set-screen 'game))])
-  (new button% [parent info-panel] [label "🚩 Modo Bandera"] 
-       [callback (lambda (btn evt) (toggle-flag-mode))])
-  (new button% [parent info-panel] [label "Menú"] 
+  (new button% [parent controls-panel] [label "Menú"] 
+       [min-width 100]
        [callback (lambda (btn evt) (set-screen 'start))])
-  
-  ;; Indicador de modo bandera
-  (define flag-indicator (new message% [parent info-panel] [label "⚪ Normal"]))
+  (new button% [parent controls-panel] [label "🚩 Modo Bandera"] 
+       [min-width 120]
+       [callback (lambda (btn evt) (toggle-flag-mode))])
+  ;; Indicador de modo bandera junto al botón
+  (define flag-indicator (new message% [parent controls-panel] [label "⚪ Normal"] [font (make-object font% 14 'default 'normal 'bold)]))
   (set-box! flag-mode-label flag-indicator)
+  ;; Espaciador pequeño
+  (new message% [parent main-panel] [label ""])
+  ;; Panel del tablero centrado y estirable
   (define game-panel (new vertical-panel% 
                          [parent main-panel] 
                          [spacing 0]
-                         [horiz-margin 5]
-                         [vert-margin 5]))
+                         [horiz-margin 0]
+                         [vert-margin 0]
+                         [alignment '(center center)]
+                         [stretchable-height #t]))
   (for ([row-idx rows])
     (define row-panel (new horizontal-panel% 
-                          [parent game-panel] 
-                          [horiz-margin 0] 
-                          [vert-margin 0]
-                          [spacing 0]
-                          [stretchable-height #f]))
-    (for ([col-idx cols])
-      (create-cell-button row-panel row-idx col-idx)))
+                  [parent game-panel] 
+                  [horiz-margin 0] 
+                  [vert-margin 0]
+                  [spacing 0]
+                  [alignment '(center center)]
+                  [stretchable-height #f]))
+      (for ([col-idx cols])
+        (create-cell-button row-panel row-idx col-idx)))
   main-panel)

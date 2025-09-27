@@ -15,54 +15,57 @@
 
 ;; =============================== UI: PANTALLA DE INICIO ===============================
 (define (show-start-screen mainWindow)
-  (define main-panel (new vertical-panel% [parent mainWindow]))
-  
-  ;; Título
-  (new message% [parent main-panel] 
-       [label "MineCEepper"]
-       [font (make-object font% 24 'default 'normal 'bold)])
-  
-  (new message% [parent main-panel] [label ""])  ; Espaciado
-  
-  ;; Configuración de tamaño personalizado
-  (new message% [parent main-panel] [label "Tamaño del tablero (8-15):"])
-  (define size-panel (new horizontal-panel% [parent main-panel]))
-  
-  ;; Campo para filas
+  (define main-panel (new vertical-panel% [parent mainWindow]
+                          [horiz-margin 2]
+                          [vert-margin 2]
+                          [spacing 0]
+                          [alignment '(center center)]
+                          [stretchable-height #t]))
+  ;; Panel superior: título y rango
+  (define top-panel (new vertical-panel% [parent main-panel]
+                        [alignment '(center center)]
+                        [spacing 0]))
+  (new message% [parent top-panel] 
+    [label "MineCEepper"]
+    [font (make-object font% 32 'default 'normal 'bold)])
+  (new message% [parent top-panel]
+    [label "Rango permitido: 8-15 para filas y columnas"]
+    [font (make-object font% 16 'default 'normal 'normal)])
+  ;; Panel de inputs
+  (define size-panel (new horizontal-panel% [parent main-panel]
+                         [alignment '(center center)]
+                         [spacing 0]))
   (new message% [parent size-panel] [label "Filas:"])
   (define rows-field (new text-field% 
                          [label ""]
                          [parent size-panel]
                          [init-value "8"]
                          [min-width 60]))
-  
-  (new message% [parent size-panel] [label "   Columnas:"])
+  (new message% [parent size-panel] [label "Columnas:"])
   (define cols-field (new text-field% 
                          [label ""]
                          [parent size-panel]
                          [init-value "8"]
                          [min-width 60]))
-  
-  (new message% [parent main-panel] [label ""])  ; Espaciado
-  
-  ;; Selección de dificultad  
-  (new message% [parent main-panel] [label "Dificultad:"])
-  (define difficulty-panel (new horizontal-panel% [parent main-panel]))
-  
+  ;; Panel de dificultad
+  (define difficulty-panel (new horizontal-panel% [parent main-panel]
+                                [alignment '(center center)]
+                                [spacing 0]))
+  (new message% [parent difficulty-panel] [label "Dificultad:"])
   (define difficulty-choice (new choice%
                                 [label ""]
                                 [parent difficulty-panel]
                                 [choices '("Fácil (10%)" "Medio (15%)" "Difícil (20%)")]))
-  
-  (new message% [parent main-panel] [label ""])  ; Espaciado
-  
-  ;; Botón para iniciar juego
+  ;; Panel de botón centrado
+  (define button-panel (new vertical-panel% [parent main-panel]
+                           [alignment '(center center)]
+                           [spacing 0]))
   (new button%
-    [parent main-panel]
+    [parent button-panel]
     [label "¡Iniciar Juego!"]
+    [min-width 180]
     [callback (lambda (_btn _evt)
                 (start-new-game rows-field cols-field difficulty-choice))])
-  
   main-panel)
 
 ;; =============================== LÓGICA: INICIAR NUEVO JUEGO ===============================
