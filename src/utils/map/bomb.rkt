@@ -51,11 +51,13 @@
 (define (shuffle list)
   (define (shuffle_aux input output)
     (cond
-      [(null? input) output]
-      [else
-       (let ([rand_index (random (length input))])
-         (shuffle_aux (append (take input rand_index) (drop input (+ rand_index 1)))
-                      (cons (list-ref input rand_index) output)))]))
+      ((null? input) output)
+      (else
+       (define len (length input))
+       (define rand (random len))
+       (define selected (list-ref input rand))
+       (define remaining (append (take input rand) (drop input (+ rand 1))))
+       (shuffle_aux remaining (cons selected output)))))
   (shuffle_aux list '()))
 
 ;; Coloca una bomba en la posición dada
