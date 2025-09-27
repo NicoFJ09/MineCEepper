@@ -4,9 +4,10 @@
 ;; START.RKT - Pantalla de inicio y configuración del juego
 ;; ===============================================================================================
 ;; Funcionalidad: Interfaz para seleccionar configuración del juego
-;; - Selección de tamaño del tablero (8x8, 10x10, 12x12, 15x15)
+;; - Configuración manual de dimensiones del tablero (8-15 filas/columnas)
 ;; - Selección de dificultad (Fácil 10%, Medio 15%, Difícil 20%)
-;; - Botón para iniciar nueva partida
+;; - Validación de entrada para asegurar valores en rango válido
+;; - Botón para iniciar nueva partida con configuración personalizada
 ;; ===============================================================================================
 
 (provide show-start-screen)
@@ -23,14 +24,24 @@
   
   (new message% [parent main-panel] [label ""])  ; Espaciado
   
-  ;; Selección de tamaño
-  (new message% [parent main-panel] [label "Tamaño del tablero:"])
+  ;; Configuración de tamaño personalizado
+  (new message% [parent main-panel] [label "Tamaño del tablero (8-15):"])
   (define size-panel (new horizontal-panel% [parent main-panel]))
   
-  (define size-choice (new choice% 
-                          [label ""]
-                          [parent size-panel]
-                          [choices '("8x8" "10x10" "12x12" "15x15")]))
+  ;; Campo para filas
+  (new message% [parent size-panel] [label "Filas:"])
+  (define rows-field (new text-field% 
+                         [label ""]
+                         [parent size-panel]
+                         [init-value "8"]
+                         [min-width 60]))
+  
+  (new message% [parent size-panel] [label "   Columnas:"])
+  (define cols-field (new text-field% 
+                         [label ""]
+                         [parent size-panel]
+                         [init-value "8"]
+                         [min-width 60]))
   
   (new message% [parent main-panel] [label ""])  ; Espaciado
   
@@ -50,25 +61,35 @@
     [parent main-panel]
     [label "¡Iniciar Juego!"]
     [callback (lambda (_btn _evt)
-                (start-new-game size-choice difficulty-choice))])
+                (start-new-game rows-field cols-field difficulty-choice))])
   
   main-panel)
 
 ;; =============================== LÓGICA: INICIAR NUEVO JUEGO ===============================
-(define (start-new-game size-choice difficulty-choice)
-  ;; Obtener tamaño seleccionado
-  (define size-index (send size-choice get-selection))
-  (define sizes '((8 8) (10 10) (12 12) (15 15)))
-  (define selected-size (list-ref sizes size-index))
-  (define rows (car selected-size))
-  (define cols (cadr selected-size))
+(define (start-new-game rows-field cols-field difficulty-choice)
+  ;; Obtener valores ingresados manualmente
+  (define rows-text (send rows-field get-value))
+  (define cols-text (send cols-field get-value))
   
-  ;; Obtener dificultad seleccionada  
-  (define difficulty-index (send difficulty-choice get-selection))
-  (define difficulty (+ difficulty-index 1)) ; 0->1, 1->2, 2->3
+  ;; Validar y convertir a números
+  (define rows (string->number rows-text))
+  (define cols (string->number cols-text))
   
-  ;; Configurar el juego
-  (set-game-config! rows cols difficulty)
-  
-  ;; Ir a la pantalla de juego
-  (set-screen 'game))
+  ;; Validar rango (8-15)
+  (cond
+    [(or (not rows) (not cols) 
+         (< rows 8) (> rows 15) 
+         (< cols 8) (> cols 15))
+     (message-box "Error de Validación" 
+                  "Por favor ingrese números válidos entre 8 y 15 para filas y columnas."
+                  #f '(ok))]
+    [else
+     ;; Obtener dificultad seleccionada  
+     (define difficulty-index (send difficulty-choice get-selection))
+     (define difficulty (+ difficulty-index 1)) ; 0->1, 1->2, 2->3
+     
+     ;; Configurar el juego
+     (set-game-config! rows cols difficulty)
+     
+     ;; Ir a la pantalla de juego
+     (set-screen 'game)]))
