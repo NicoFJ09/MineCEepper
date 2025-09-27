@@ -100,12 +100,17 @@
 ;; MODO BANDERA
 ;; -------------------------------------------------------------------------------
 
-(define flag-mode (box #f)) ; Estado global del modo bandera
+(define flag-mode (box #f)) ; 
+(define flag-mode-label (box #f)) 
 
 ;; Alterna el modo bandera (solo por botón)
 (define (toggle-flag-mode)
   (define current-mode (unbox flag-mode))
   (set-box! flag-mode (not current-mode))
+  (define new-text (if (not current-mode) "🚩 Banderas" "⚪ Normal"))
+  (define label (unbox flag-mode-label))
+  (when label
+    (send label set-label new-text))
   (printf "Modo bandera: ~a~n" (if (not current-mode) "ACTIVADO" "DESACTIVADO")))
 
 ;; -------------------------------------------------------------------------------
@@ -150,6 +155,10 @@
        [callback (lambda (btn evt) (toggle-flag-mode))])
   (new button% [parent info-panel] [label "Menú"] 
        [callback (lambda (btn evt) (set-screen 'start))])
+  
+  ;; Indicador de modo bandera
+  (define flag-indicator (new message% [parent info-panel] [label "⚪ Normal"]))
+  (set-box! flag-mode-label flag-indicator)
   (define game-panel (new vertical-panel% 
                          [parent main-panel] 
                          [spacing 0]
