@@ -5,3 +5,9 @@ compiled/
 *.bak
 \#*
 .\#*
+
+# Archivos ejecutables y distribución
+MineCEepper-dist/
+MineCEepper-dist\
+MineCEepper.exe
+*.exe

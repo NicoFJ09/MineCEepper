@@ -17,9 +17,31 @@
 (require "cell-status.rkt")
 (require "events.rkt")
 
-;; Función para cargar imagen
+;; Obtiene la ruta base del ejecutable o del código fuente
+(define (get-base-path)
+  (let ([exe-path (find-system-path 'exec-file)])
+    (if (file-exists? exe-path)
+        (let-values ([(base name dir?) (split-path exe-path)])
+          (if (path? base)
+              (path->string base)
+              (current-directory)))
+        (current-directory))))
+
+;; Resuelve la ruta del asset relativa a la ubicación del ejecutable
+(define (resolve-asset-path relative-path)
+  (define cleaned-path (if (string-prefix? relative-path "./")
+                           (substring relative-path 2)
+                           relative-path))
+  (build-path (get-base-path) cleaned-path))
+
+;; Función para cargar imagen con ruta resuelta
 (define (load-image path)
-  (read-bitmap path))
+  (define resolved-path (resolve-asset-path path))
+  (if (file-exists? resolved-path)
+      (read-bitmap resolved-path)
+      (begin
+        (printf "ADVERTENCIA: No se encontró el archivo: ~a~n" resolved-path)
+        (make-object bitmap% 25 25))))
 
 ;; Alternar modo bandera (solo por botón)
 (define flag-mode (box #f)) ; Si prefieres, puedes mover esto a un módulo de estado general
